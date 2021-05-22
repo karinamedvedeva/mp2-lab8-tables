@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="HashTable.h" />
     <ClInclude Include="Tables.h" />
     <ClInclude Include="TreeTable.h" />
   </ItemGroup>
