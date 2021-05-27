@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <fstream>
+#include <string>
 using namespace std;
 
 typedef int TKey;
@@ -10,12 +11,43 @@ struct TRecord
 {
 	TKey key;
 	TVal val;
+public:
+
+	TRecord(TKey k = -1, TVal v = -1) 
+	{
+		key = k;
+		val = v;
+	};
+
+	TRecord& operator=( TRecord& rec)
+	{
+		this->key = rec.key;
+		this->val = rec.val;
+		return *this;
+	}
+
+	friend istream& operator>>(istream& istr, TRecord& rec)
+	{
+		int _key, _val;
+		istr >> _key;
+		istr >> _val;
+		rec.key = _key;
+		rec.val = _val;
+		return istr;
+	}
+
+	friend ostream& operator<<(ostream& ostr, const TRecord& rec)
+	{
+		int k = rec.key;
+		int v = rec.val;
+		ostr << " | " << " " << k << " "  << " | " <<" " << v << " " << " | " <<endl;
+		return ostr;
+	}
 };
 
 class TTable
 {
 protected:
-	
 	int eff;
 public:
 	int DataCount;
@@ -28,7 +60,7 @@ public:
 
 	bool IsEmpty()
 	{
-		return DataCount = 0;
+		return DataCount == 0;
 	}
 
 	int GetEff()
@@ -52,14 +84,16 @@ public:
 
 	void Print()
 	{
-		cout << "-------";
-		TRecord pCurr;
+		//TRecord pCurr;
+		cout << "----------------" << endl;
 		for (Reset(); !IsEnd(); GoNext())
 		{
-			pCurr = GetCurr();
-			cout << pCurr.val << endl;
-		//	cout << GetCurr();
+			/*pCurr = GetCurr();
+			cout << pCurr.val << endl;*/
+		
+			cout << GetCurr();
 		}
+		cout << "----------------";
 	}
 };
 
@@ -72,7 +106,7 @@ protected:
 public:
 	int size;
 
-	TArrayTable(int _size = 100) : TTable()
+	TArrayTable(int _size = 1000) : TTable()
 	{
 		pRec = new TRecord[_size];
 		size = _size;
@@ -91,7 +125,7 @@ public:
 		pRec = new TRecord[size];
 		for (int i = 0; i < size; i++)
 		{
-			pRec[i] = nt[i];
+			pRec[i] = nt.pRec[i];
 		}
 	}
 
@@ -112,8 +146,7 @@ public:
 
 	bool IsFull()
 	{
-		if (size == DataCount)
-			return true;
+		return size == DataCount;
 	}
 
 	int GetSize()
@@ -138,15 +171,14 @@ public:
 
 	bool IsEnd()
 	{
-		if (Curr == DataCount)
-			return true;
+		return Curr == DataCount;
 	}
 };
 
 class TScanTable : public TArrayTable<TRecord>
 {
 public:
-	TScanTable(int _size = 100) : TArrayTable(_size) {}
+	TScanTable(int _size = 1000) : TArrayTable(_size) {}
 
 	bool Find(TKey k)
 	{
@@ -159,8 +191,8 @@ public:
 				Curr = i;
 				break;
 			}
+			eff++;
 		}
-		eff++;
 		if (!flag)
 			Curr = DataCount;
 		return flag;
@@ -182,6 +214,7 @@ public:
 		{
 			pRec[Curr] = rec;
 			DataCount++;
+			eff++;
 			return true;
 		}
 		return false;
@@ -222,7 +255,7 @@ private:
 			QuickSort(l, right);
 	}
 public:
-	TSortTable(int _size = 100) : TScanTable(_size) {}
+	TSortTable(int _size = 1000) : TScanTable(_size) {}
 
 	bool Find(TKey k)
 	{

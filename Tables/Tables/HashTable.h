@@ -1,5 +1,6 @@
 #pragma once
 #include "Tables.h"
+#include <string>
 
 class THashTable : public TTable
 {
@@ -14,11 +15,15 @@ protected:
 		return k % MaxSize;
 	}
 
-	/*THashTable(int size, int _step)
+public:
+	THashTable(int s=100)
 	{
-		size = MaxSize;
-		step = _step;
-	}*/
+		MaxSize = s;
+		step = 1;
+		Curr = NULL;
+		mas = new TRecord[s];
+		DellPos = 0;
+	}
 
 	bool Find(TKey k)
 	{
@@ -30,7 +35,7 @@ protected:
 			if (mas[Curr].key == k)
 				return true;
 			else
-				if (mas[Curr].key = del && DellPos == -1)
+				if (mas[Curr].key == del && DellPos == -1)
 					DellPos = Curr;
 				else
 					if (mas[Curr].key == free)
@@ -83,6 +88,16 @@ protected:
 
 	bool IsEnd()
 	{
-		Curr = MaxSize;
+		return Curr == MaxSize;
+	}
+
+	TRecord GetCurr()
+	{
+		return mas[Curr];
+	}
+
+	bool IsFull()
+	{
+		return MaxSize == DataCount;
 	}
 };

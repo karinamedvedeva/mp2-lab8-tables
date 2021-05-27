@@ -18,21 +18,30 @@ class TTreeTable : public TTable
 {
 protected:
 	TNode* pRoot, * pCurr, * pPrev;
-	stack<TNode> st;
+	stack<TNode*> st;
+	int pos;
 public:
-	bool Find(TKey k)
+
+	TTreeTable()
+	{
+		pRoot = NULL;
+		pCurr = NULL;
+		pPrev = NULL;
+	}
+
+	bool Find(TKey key)
 	{
 		pCurr = pRoot;
 		pPrev = NULL;
 		while (pCurr)
 		{
 			eff++;
-			if (pCurr->key == k)
+			if (pCurr->key == key)
 				break;
 			else
 			{
 				pPrev = pCurr;
-				if (pCurr->key > k)
+				if (pCurr->key > key)
 					pCurr = pCurr->pLeft;
 				else
 					pCurr = pCurr->pRight;
@@ -66,9 +75,9 @@ public:
 		}
 	}
 
-	void Delete(TKey k)
+	void Delete(TKey key)
 	{
-		if (Find(k))
+		if (Find(key))
 		{
 			if (!pCurr->pLeft && !pCurr->pRight)
 			{
@@ -109,4 +118,64 @@ public:
 			}
 		}
 	}
+
+
+
+
+
+	void Reset()
+	{
+		pos = 0;
+		while (!st.empty())
+			st.pop();
+		pCurr = pRoot;
+		if (pCurr != nullptr)
+		{
+			while (pCurr->pLeft != NULL)
+			{
+				st.push(pCurr);
+				pCurr = pCurr->pLeft;
+			}
+		}
+		st.push(pCurr);
+	}
+
+	void GoNext()
+	{
+		if (!st.empty())
+			st.pop();
+		pos++;
+		if (pCurr->pRight != nullptr)
+		{
+			pCurr = pCurr->pRight;
+			while (pCurr->pLeft != nullptr)
+			{
+				st.push(pCurr);
+				pCurr = pCurr->pLeft;
+			}
+			st.push(pCurr);
+		}
+		else
+			if (!st.empty())
+			{
+				pCurr = st.top();
+				//st.pop();
+			}
+	}
+
+	bool IsEnd()
+	{
+		return(pos == DataCount);
+	}
+
+	bool IsFull()
+	{
+		return false;
+	}
+
+	TRecord GetCurr()
+	{
+		return pCurr->rec;
+	}
+
 };
