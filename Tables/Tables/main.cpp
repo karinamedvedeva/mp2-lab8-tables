@@ -5,26 +5,22 @@
 #include <locale>
 #include <Windows.h>
 
-void SetColor(int text, int bg) {
-	HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-	SetConsoleTextAttribute(hStdOut, (WORD)((bg << 4) | text));
-}
-
 int main()
 {
 	setlocale(LC_CTYPE, "Rus");
-	int size, a, type; 
+	int MaxSize,size, a, type; 
 	int step=1;
 	cout << "Введите максимальный размер таблицы: ";
-	cin >> size;
-	TScanTable* ScanTable=new TScanTable(size);
-	TSortTable* SortTable = new TSortTable(size);
+	cin >> MaxSize;
+	TScanTable* ScanTable=new TScanTable(MaxSize);
+	TSortTable* SortTable = new TSortTable(MaxSize);
 	TTreeTable* TreeTable = new TTreeTable;
-	THashTable* HashTable = new THashTable(size);
+	THashTable* HashTable = new THashTable(MaxSize);
 	TTable* table = ScanTable;
 	TKey key=0;
 	TVal val=0;
 	TRecord pRec;
+	char fn[] = "C:\\Users\\karina\\OneDrive\\Документы\\Projects\\mp2-lab8-tables\\Tables\\tables.txt";
 	do
 	{
 		cout << endl<<"1. Создать таблицу" << endl << "2. Выбрать вид таблицы и вывести ее на экран" << endl << "3. Вставить запись" << endl << "4. Поиск записи по ключу" << endl<<"5. Удалить запись"<<endl;
@@ -35,15 +31,10 @@ int main()
 		case 1:
 			cout << "Введите размер таблицы: ";
 			cin >> size;
-			ScanTable = new TScanTable(size);
-			SortTable = new TSortTable(size);
-			HashTable = new THashTable(size);
-			TreeTable = new TTreeTable;
-			table = ScanTable;
 			for (int i = 0; i < size; i++)
 			{
-				pRec.key = rand() % 100;
-				pRec.val = rand() % 10;
+				pRec.key = rand() % 1000;
+				pRec.val = rand() % 1000;
 				ScanTable->Insert(pRec);
 				SortTable->Insert(pRec);
 				HashTable->Insert(pRec);
@@ -60,21 +51,25 @@ int main()
 				table = ScanTable;
 				ScanTable->Print();
 				cout << endl;
+				table->Save(fn);
 				break;
 			case 2: 
 				table = SortTable;
 				SortTable->Print();
 				cout << endl;
+				table->Save(fn);
 				break;
 			case 3:
 				table = TreeTable;
 				TreeTable->Print();
 				cout << endl;
+				table->Save(fn);
 				break;
 			case 4:
 				table = HashTable;
 				HashTable->Print();
 				cout << endl;
+				table->Save(fn);
 				break;
 			}
 			break;
@@ -85,6 +80,7 @@ int main()
 			table->Insert(pRec);
 			table->Print();
 			cout << "Эффективность операции вставки: " << table->GetEff() << endl;
+			table->Save(fn);
 			break;
 		case 4:
 			table->ClearEff();
@@ -100,6 +96,7 @@ int main()
 				cout << "Данная запись отсутвует" << endl;
 				cout << "Эффективность операции поиска: " << table->GetEff() << endl;
 			}
+			table->Save(fn);
 			break;
 		case 5:
 			table->ClearEff();
@@ -108,6 +105,7 @@ int main()
 			table->Delete(key);
 			table->Print();
 			cout << "Эффективность операции удаления: " << table->GetEff() << endl;
+			table->Save(fn);
 			break;
 		}
 	} while (a != 0);

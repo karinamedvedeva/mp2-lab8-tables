@@ -16,13 +16,15 @@ protected:
 	}
 
 public:
-	THashTable(int s=100)
+	THashTable(int s=1000)
 	{
 		MaxSize = s;
 		step = 1;
 		Curr = NULL;
 		mas = new TRecord[s];
-		DellPos = 0;
+		for (int i = 0; i < MaxSize; i++)
+			mas[i].key = -1;
+		DellPos = -1;
 	}
 
 	bool Find(TKey k)
@@ -49,22 +51,30 @@ public:
 
 	bool Insert(TRecord rec)
 	{
+		if (IsFull())
+			throw 0;
 		if (!Find(rec.key))
 		{
 			mas[Curr] = rec;
 			DataCount++;
+			eff++;
 			return true;
 		}
 		else
+		{
 			return false;
+		}
 	}
 
 	void Delete(TKey k)
 	{
+		if (IsEmpty())
+			throw 0;
 		if (Find(k))
 		{
 			DataCount--;
 			mas[Curr].key = del;
+			eff++;
 		}
 	}
 
@@ -99,5 +109,10 @@ public:
 	bool IsFull()
 	{
 		return MaxSize == DataCount;
+	}
+
+	int GetMaxSize()
+	{
+		return MaxSize;
 	}
 };

@@ -13,16 +13,19 @@ struct TRecord
 	TVal val;
 public:
 
-	TRecord(TKey k = -1, TVal v = -1) 
+	TRecord(TKey k = 0, TVal v = 0) 
 	{
 		key = k;
 		val = v;
 	};
 
-	TRecord& operator=( TRecord& rec)
+	TRecord& operator=(const TRecord& rec)
 	{
-		this->key = rec.key;
-		this->val = rec.val;
+		if (&rec != this)
+		{
+			key = rec.key;
+			val = rec.val;
+		}
 		return *this;
 	}
 
@@ -42,6 +45,12 @@ public:
 		int v = rec.val;
 		ostr << " | " << " " << k << " "  << " | " <<" " << v << " " << " | " <<endl;
 		return ostr;
+	}
+
+	void InsRec(TRecord rec)
+	{
+		key = rec.key;
+		val = rec.val;
 	}
 };
 
@@ -68,6 +77,11 @@ public:
 		return eff;
 	}
 
+	int GetDataCount()
+	{
+		return DataCount;
+	}
+
 	void ClearEff()
 	{
 		eff = 0;
@@ -84,16 +98,23 @@ public:
 
 	void Print()
 	{
-		//TRecord pCurr;
 		cout << "----------------" << endl;
 		for (Reset(); !IsEnd(); GoNext())
 		{
-			/*pCurr = GetCurr();
-			cout << pCurr.val << endl;*/
-		
 			cout << GetCurr();
 		}
 		cout << "----------------";
+	}
+
+	void Save(string fn)
+	{
+		ofstream ostr(fn);
+		TRecord tmp;
+		for (Reset(); !IsEnd(); GoNext())
+		{
+			tmp = this->GetCurr();
+			ostr << " | " << tmp.key << " | " << tmp.val << " | " << endl;
+		}
 	}
 };
 
@@ -146,13 +167,13 @@ public:
 
 	bool IsFull()
 	{
-		return size == DataCount;
+		return DataCount==size;
 	}
 
-	int GetSize()
+	/*int GetSize()
 	{
 		return size;
-	}
+	}*/
 
 	TRecord GetCurr()
 	{
@@ -185,13 +206,13 @@ public:
 		bool flag = false;
 		for (int i = 0; i < DataCount; i++)
 		{
+			eff++;
 			if (pRec[i].key == k)
 			{
 				flag = true;
 				Curr = i;
 				break;
 			}
-			eff++;
 		}
 		if (!flag)
 			Curr = DataCount;
@@ -200,6 +221,8 @@ public:
 	  
 	void Delete(TKey k)
 	{
+		if (IsEmpty())
+			throw 0;
 		if (Find(k))
 		{
 			pRec[Curr] = pRec[DataCount - 1];
@@ -210,7 +233,9 @@ public:
 
 	bool Insert(TRecord rec)
 	{
-		if (!Find(rec.key))
+		if (IsFull())
+			throw 0;
+		if (!this->Find(rec.key))
 		{
 			pRec[Curr] = rec;
 			DataCount++;
@@ -231,15 +256,16 @@ private:
 		TKey key = pRec[x].key;
 		while (l < r)
 		{
+			eff++;
 			while (pRec[l].key < key)
 			{
-				l++; 
 				eff++;
+				l++; 
 			}
 			while (pRec[r].key > key)
 			{
-				r--;
 				eff++;
+				r--;
 			}
 			if (l <= r)
 			{
@@ -247,7 +273,6 @@ private:
 				pRec[r].key = pRec[l].key;
 				pRec[l].key = tmp;
 			}
-			eff++;
 		}
 		if (left < r)
 			QuickSort(left, r);
@@ -286,8 +311,12 @@ public:
 
 	bool Insert(TRecord rec)
 	{
+		if (IsFull())
+			throw 0;
 		if (Find(rec.key))
+		{
 			return false;
+		}
 		else
 		{
 			for (int i = DataCount - 1; i >= Curr; i--)
@@ -303,27 +332,18 @@ public:
 
 	void Delete(TKey k)
 	{
+		if (IsEmpty())
+			throw 0;
 		if (Find(k))
 		{
+			//eff++;
+			DataCount--;
 			for (int i = Curr; i < DataCount; i++)
 			{
 				pRec[i] = pRec[i + 1];
 				eff++;
 			}
-			DataCount--; 
 		}
 	}
-
-	/*void operator=(const TScanTable& st)
-	{
-		if (size != st.size)
-		{
-			delete[]pRec;
-			pRec = new TRecord[st.size];
-			size = st.size;
-			DataCount = st.DataCount;
-		}
-		for ()
-	}*/
 
 };
